@@ -10,7 +10,7 @@ class Customer(models.Model):
     name = models.CharField(max_length=200, null=True)
     email = models.EmailField(null=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 class Product(models.Model):
@@ -43,8 +43,8 @@ class Order(models.Model):
     @property
     def shipping(self):
         shipping = False
-        orderitem = self.orderitem_set.all()
-        for i in orderitem:
+        orderitems = self.orderitem_set.all()
+        for i in orderitems:
             if i.product.digital == False:
                 shipping = True
         return shipping
