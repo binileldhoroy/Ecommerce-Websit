@@ -68,12 +68,49 @@
     </div>
 </div>
 
-<script src="https://www.paypal.com/sdk/js?client-id=test&currency=USD"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=AZ424SsZL4zzCDRL3X_TCoO0ekvI97U9y3wAa_AWX1Ug6b0upUrFr_uwANdW4sMWdoXnvYY-kz68SnZb&currency=USD"></script>
+
+<script>
+    var total = parseFloat('{{order.get_cart_total}}')
+    var amount = total / 74
+    // Render the PayPal button into #paypal-button-container
+    paypal.Buttons({
+        style: {
+                color:  'blue',
+                shape:  'pill',
+                label:  'pay',
+                height: 40
+            },
+
+
+        // Set up the transaction
+        createOrder: function(data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: parseFloat(amount).toFixed(2)
+                    }
+                }]
+            });
+        },
+
+        // Finalize the transaction
+        onApprove: function(data, actions) {
+            return actions.order.capture().then(function(orderData) {
+                // Successful capture! For demo purposes:
+                console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+                var transaction = orderData.purchase_units[0].payments.captures[0];
+                submitFormData()
+            });
+        }
+
+
+    }).render('#paypal-button-container');
+</script>
 
 <script>
     var shipping = "{{order.shipping}}"
-    console.log(shipping)
-    var total = "{{order.get_cart_total}}"
+
     if(shipping == 'False'){
         document.getElementById('shipping-info').innerHTML = ''
     }
@@ -83,8 +120,8 @@
     }
 
     if(shipping == 'False' && user != 'AnonymousUser'){
-        document.getElementById('form-wrapper').classList.add("hidden")
-        document.getElementById('payment-info').classList.remove("hidden")
+        document.getElementById('form-wrapper').classList.add("hidden");
+        document.getElementById('payment-info').classList.remove("hidden");
     }
 
     var form = document.getElementById('form')
@@ -98,9 +135,9 @@
         document.getElementById('payment-info').classList.remove("hidden")
     })
 
-    document.getElementById('make-payment').addEventListener('click',function(e){
-    submitFormData()
-    })
+    // document.getElementById('make-payment').addEventListener('click',function(e){
+    // submitFormData()
+    // })
 
     function submitFormData(){
         var userFormData = {
@@ -146,7 +183,7 @@
         document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
 
         window.location.href = "{% url 'store' %}"
-    });
+    })
 }
 
 </script>
